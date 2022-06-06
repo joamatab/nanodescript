@@ -58,13 +58,10 @@ class LayerMatcher(NanoscribeMatcher):
         in its dependencies, return False otherwise.
         """
 
-        # Return True at the first matching object in the Cell.
-        for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
-            if poly.layer == self.layer_num:
-                return True
-
-        # Else return False
-        return False
+        return any(
+            poly.layer == self.layer_num
+            for poly in gdscell.polygons + gdscell.paths + gdscell.labels
+        )
 
 
 class LayerDatatypeMatcher(NanoscribeMatcher):
@@ -102,13 +99,10 @@ class LayerDatatypeMatcher(NanoscribeMatcher):
         in its dependencies, return False otherwise.
         """
 
-        # Return True at the first matching object in the Cell.
-        for poly in gdscell.polygons + gdscell.paths + gdscell.labels:
-            if poly.layer == self.layer_num and poly.datatype == self.datatype_num:
-                return True
-
-        # Else return False
-        return False
+        return any(
+            poly.layer == self.layer_num and poly.datatype == self.datatype_num
+            for poly in gdscell.polygons + gdscell.paths + gdscell.labels
+        )
 
 
 class PrintZoneMatcher(NanoscribeMatcher):
@@ -135,7 +129,7 @@ class PrintZoneMatcher(NanoscribeMatcher):
         cellnames = [c.name for c in library.cells]
 
         # Raise an error for empty libraries
-        if len(cellnames) == 0:
+        if not cellnames:
             raise ValueError(f"""Empty gds library: {library}""")
 
         # Look for cells with the correct name in the
@@ -161,9 +155,8 @@ def get_all_matchers_names() -> list[str]:
 
 def get_matcher_by_name(matcher_name: str) -> NanoscribeMatcher:
     """Return an instance of the correct matcher class given the input string"""
-    matcherclasses = [cls for cls in NanoscribeMatcher.__subclasses__()]
+    matcherclasses = list(NanoscribeMatcher.__subclasses__())
     for mc in matcherclasses:
         if matcher_name.lower() == mc.__name__.lower():
             return mc()
-    else:
-        raise ValueError(f"No NanoscribeMatcher named {matcher_name}")
+    raise ValueError(f"No NanoscribeMatcher named {matcher_name}")

@@ -100,8 +100,7 @@ class GwlHandler:
         with file.open("r") as f:
             lines = f.readlines()
             for line in lines:
-                line = line.strip()
-                if line:
+                if line := line.strip():
                     cmd = cmds.parse_describe_line(line, accept_unknown=accept_unknown_commands)
                     self.gwl_commands.append(cmd)
 

@@ -14,19 +14,19 @@ here_path = Path(__file__).parent
 class TestGwlHandler:
 
     @classmethod
-    def setup_class(self):
+    def setup_class(cls):
         """ setup the initial configuration state to default while back-uping
         """
 
-        self.bkup_conf = copy.deepcopy(conf)
+        cls.bkup_conf = copy.deepcopy(conf)
         conf.reset_config()
 
     @classmethod
-    def teardown_class(self):
+    def teardown_class(cls):
         """ teardown any state that was previously setup with a call to
         setup_class.
         """
-        conf = self.bkup_conf
+        conf = cls.bkup_conf
         conf.save_config()
 
     def test_path(self):
