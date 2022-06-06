@@ -53,12 +53,10 @@ class NanoscribeGdsHandler:
         self.nanoscribe_cells_associations: list[CellAssociation] = []
         self.recipes = []
 
-        # Output directory
         if out_dir.exists() and not out_dir.is_dir():
             raise ValueError(f"Expecting a directory for out_dir. Received {out_dir}")
-        else:
-            out_dir.mkdir(parents=True, exist_ok=True)
-            self.out_dir = out_dir
+        out_dir.mkdir(parents=True, exist_ok=True)
+        self.out_dir = out_dir
 
         # Production variables
         self.topcell = None
@@ -109,8 +107,6 @@ class NanoscribeGdsHandler:
 
     def get_nanoscribe_cells(self) -> list[Cell]:
         """Return all the nanoscribe cells in the library"""
-        ns_cells = []
-
         is_set = [c.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))
                   is not None for c in self.library.cells]
 
@@ -120,11 +116,13 @@ class NanoscribeGdsHandler:
                                f'{nanodescript_config.get("identifiers", "is_nanoscribe")} associated '
                                f'with nanoscribe cells is not set.')
 
-        # Then, output a list of all cells evaluating Nanoscribe as true.
-        for cell in self.library.cells:
-            if cell.get_property(nanodescript_config.get('identifiers', 'is_nanoscribe'))[0]:
-                    ns_cells.append(cell)
-        return ns_cells
+        return [
+            cell
+            for cell in self.library.cells
+            if cell.get_property(
+                nanodescript_config.get('identifiers', 'is_nanoscribe')
+            )[0]
+        ]
 
     def match_stl_files(self, stlpaths: list[Path] = None) -> None:
         """Test if a list of paths towards stl files contains a match for a cell. If no list of paths towards .stl files

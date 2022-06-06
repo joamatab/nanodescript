@@ -590,8 +590,7 @@ class Describe_include(DescribeCommand):
     def parse(self, gwl_path: str):
         gwl_path = gwl_path.strip(" '\"\t\n")
 
-        if not gwl_path.endswith(".gwl") or gwl_path.endswith(".gwl"):
-            raise ValueError(f"{gwl_path} is does not direct to a '.gwl' or '.gwlb' file")
+        raise ValueError(f"{gwl_path} is does not direct to a '.gwl' or '.gwlb' file")
 
 
 class Describe_repeat(DescribeCommand):
@@ -607,7 +606,10 @@ class Describe_repeat(DescribeCommand):
 def _check_var_name(varstring: str) -> None:
     """ raise an error if the variable name does not comply with describe rules."""
     if not varstring.startswith("$"):
-        raise ValueError(f'string does not start with $ which is mandatory for describe variable names')
+        raise ValueError(
+            'string does not start with $ which is mandatory for describe variable names'
+        )
+
     describe_expression = re.compile("^(\w)+$")
     if not describe_expression.match(varstring[1:]):
         raise ValueError(
@@ -758,7 +760,7 @@ class Describe_else(DescribeCommand):
         pass
 
     def __str__(self):
-        return f"else"
+        return "else"
 
 
 class Describe_end(DescribeCommand):
@@ -773,7 +775,7 @@ class Describe_end(DescribeCommand):
         pass
 
     def __str__(self):
-        return f"end"
+        return "end"
 
 
 class Describe_for(DescribeCommand):
@@ -807,7 +809,7 @@ class Describe_break(DescribeCommand):
         pass
 
     def __str__(self):
-        return f"break"
+        return "break"
 
 
 class Describe_continue(DescribeCommand):
@@ -820,7 +822,7 @@ class Describe_continue(DescribeCommand):
         pass
 
     def __str__(self):
-        return f"continue"
+        return "continue"
 
 
 class AddScanSpeed(DescribeCommand):
@@ -1453,7 +1455,7 @@ class Comment(DescribeCommand):
 
 # Commands designators for parsing.
 def _build_commands_dictionary():
-    subs = [cls for cls in DescribeCommand.__subclasses__()]
+    subs = list(DescribeCommand.__subclasses__())
     result_dict = {}
     for s in subs:
         shortname = s.__name__
@@ -1461,7 +1463,7 @@ def _build_commands_dictionary():
             shortname = shortname[len('Describe'):]
         elif shortname == 'Comment':
             shortname = "%"
-        result_dict.update({shortname: s})
+        result_dict[shortname] = s
     return result_dict
 
 

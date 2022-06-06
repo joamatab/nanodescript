@@ -118,11 +118,10 @@ class NanodescriptConfig:
 
         if self.config.has_option(section, option):
             self.config.set(section, option, str(val))
+        elif self.config.has_section(section):
+            raise NoOptionError(section=section, option=option)
         else:
-            if not self.config.has_section(section):
-                raise NoSectionError(section=section)
-            else:
-                raise NoOptionError(section=section, option=option)
+            raise NoSectionError(section=section)
         if also_save:
             self.save_config()
 

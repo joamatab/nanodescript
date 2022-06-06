@@ -118,7 +118,7 @@ class DescribeRecipe:
 
         for key, val in config_recipe.items():
             casted = self._cast_recipe_key_val(key, val)
-            resdict.update(casted)
+            resdict |= casted
         return resdict
 
     def _recipe_from_file(self, recipe_file: Path) -> dict:
@@ -133,29 +133,23 @@ class DescribeRecipe:
                 lsplit = [ll.strip() for ll in line.split('=')]
                 # Check if entry is in the default, in which case cast the variable into default recipe type
                 casted = self._cast_recipe_key_val(lsplit[0], lsplit[1])
-                resdict.update(casted)
+                resdict |= casted
 
         return resdict
 
     def _cast_recipe_key_val(self, recipe_key, recipe_val) -> dict:
         """Cast a key and val pair into the type defined in constants.DEFAULT_RECIPE.
         Raise ValueError if the field does not belong in the nanoscribe default recipe."""
-        casted = {}
-        # Check if the key is in the default recipe, in which case cast the variable type
-        if self.check_recipe_field(recipe_key):
-            # Getting the type of the default recipe field
-            field_type = type(DEFAULT_RECIPE[recipe_key])
-            # If the recipe field is bool, we need to handle the problem of converting str to bool
-            if field_type == bool:
-                casted[recipe_key] = self._strtobool(recipe_val)
-            # Otherwise cast
-            else:
-                casted[recipe_key] = field_type(recipe_val)
-        # Otherwise raise an error
-        else:
+        if not self.check_recipe_field(recipe_key):
             raise ValueError(f"{recipe_key} is not a valid Describe Recipe line")
-        
-        return casted
+
+        # Getting the type of the default recipe field
+        field_type = type(DEFAULT_RECIPE[recipe_key])
+        return {
+            recipe_key: self._strtobool(recipe_val)
+            if field_type == bool
+            else field_type(recipe_val)
+        }
 
     def write_recipe(self, f: str) -> None:
         """Save the recipe as a file"""

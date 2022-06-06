@@ -20,11 +20,10 @@ def find_stl_files(workpaths: Union[Path, list[Path]] = '.', recursive: bool = T
         raise ValueError(f"{workpaths} does not exist or is not a directory.")
 
     foundpath = []
-    if recursive:
-        for wp in workpaths:
+    for wp in workpaths:
+        if recursive:
             foundpath.extend(wp.rglob('*.stl'))
-    else:
-        for wp in workpaths:
+        else:
             foundpath.extend(wp.glob('*.stl'))
 
     return list(foundpath)
